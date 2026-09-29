@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <cctype>
+#include <vector>
 
 std::string normalize(const std::string &word)
 {
@@ -16,6 +17,15 @@ std::string normalize(const std::string &word)
         }
     }
     return result;
+}
+
+void add_word(std::map<std::string, int >& freq, const std::string& raw)
+{
+    std::string cur = normalize(raw);
+    if (!cur.empty())
+    {
+        freq[cur] += 1;
+    }   
 }
 
 int main(int argc, char *argv[])
@@ -63,11 +73,7 @@ int main(int argc, char *argv[])
             else if (!cur.empty())
             {
                 // space after a word: the word is complete
-                cur = normalize(cur);
-                if (!cur.empty())
-                {
-                    freq[cur] += 1;
-                }
+                add_word(freq, cur);
                 cur.clear();
             }
         }
@@ -75,11 +81,31 @@ int main(int argc, char *argv[])
         // last word of the line (no space after it)
         if (!cur.empty())
         {
-            cur = normalize(cur);
-            if (!cur.empty())
-            {
-                freq[cur] += 1;
-            }
+           add_word(freq, cur);
+        }
+    }
+    const std::size_t N = 5;
+    std::vector<std::pair<std::string, int>> top;
+    for (const auto &[w, c] : freq)
+    {
+        if (top.size() < N)
+        {
+            top.push_back({w, c});
+        }
+        else if (c > top.back().second)
+        {
+            top.back() = {w, c};
+        }
+        else
+        {
+            continue;
+        }
+        // move the last to right place
+        std::size_t i = top.size() - 1;
+        while (i > 0 && top[i].second > top[i - 1].second)
+        {
+            std::swap(top[i], top[i - 1]);
+            i--;
         }
     }
     std::cout << "File: " << filename << '\n';
@@ -89,6 +115,12 @@ int main(int argc, char *argv[])
 
     std::cout << "\nWord frequency:\n";
     for (const auto &[w, c] : freq)
+    {
+        std::cout << w << ": " << c << '\n';
+    }
+
+    std::cout << "\nTop " << N << " words:\n";
+    for (const auto &[w, c] : top)
     {
         std::cout << w << ": " << c << '\n';
     }
