@@ -1,0 +1,5 @@
+Deep learning models need data.
+This tool counts lines and words.
+C++ is fast and powerful.
+Linux is used everywhere.
+The model learns from the data.
