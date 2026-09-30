@@ -37,6 +37,17 @@ struct FileStats {
 
 using WordCount = std::pair<std::string, int>;
 
+void merge(FileStats& total, const FileStats& s)
+{
+    total.lines += s.lines;
+    total.words += s.words;
+    total.chars += s.chars;
+
+    for (const auto& [w, c] : s.freq) {
+        total.freq[w] += c;
+    }
+}
+
 bool count_file(const std::string& filename, FileStats& stats)
 {
     std::ifstream file(filename);
@@ -108,18 +119,18 @@ std::vector<WordCount> top_words(const std::map<std::string, int>& freq, std::si
     return top;
 }
 
-void print_report(const std::string& filename, const FileStats& stats, const std::vector<WordCount>& top)
+void print_report(const std::string& title, const FileStats& stats, const std::vector<WordCount>& top)
 {
-    std::cout << "File: " << filename << '\n';
+    std::cout << title << '\n';
     std::cout << "Lines: " << stats.lines << '\n';
     std::cout << "Words: " << stats.words << '\n';
     std::cout << "Characters: " << stats.chars << '\n';
 
-    std::cout << "\nWord frequency:\n";
+    /*std::cout << "\nWord frequency:\n";
     for (const auto &[w, c] : stats.freq)
     {
         std::cout << w << ": " << c << '\n';
-    }
+    }*/
 
     std::cout << "\nTop " << top.size() << " words:\n";
     for (const auto &[w, c] : top)
@@ -131,22 +142,70 @@ void print_report(const std::string& filename, const FileStats& stats, const std
 int main(int argc, char *argv[])
 {
 
+    std::size_t n = 5;
+    std::vector<std::string> files;
     if (argc < 2)
     {
         std::cerr << "Usage: myfiletool <file>\n";
         return 1;
     }
-    std::string filename = argv[1];
+    else
+    {
+        for (int i = 1; i < argc; i++)
+        {
+            std::string arg = argv[i];
+            if (arg == "--top")
+            {
+                if (i+1 >= argc)
+                {   
+                    std::cerr << "Error: --top need a number\n";
+                    return 1;
+                }
+                int num = 0;
+                try{
+                    num = std::stoi(argv[i+1]);
+                }catch (const std::invalid_argument& e) {
+                    std::cerr << "無效的數字字串\n" << std::endl;
+                    return 1;
+                } catch (const std::out_of_range& e) {
+                    std::cerr << "數值超出 int 範圍\n" << std::endl;
+                    return 1;
+                }
+                if (num <= 0){
+                    std::cerr << "--top need be a positive number\n";
+                    return 1;
+                }
+                n = static_cast<std::size_t>(num);
+                            
 
-    FileStats stats;
-    if (!count_file(filename, stats)) {
-        std::cerr << "Error: cannot open " << filename << '\n';
-        return 1;
+            }
+            else if (arg.find(".txt") != std::string::npos){
+                files.push_back(arg);
+            }
+
+        }
+        
+    }
+    FileStats total;
+    bool failed = false;
+    for (std::string filename: files){
+        FileStats stats;
+        
+        if (!count_file(filename, stats)) {
+            std::cerr << "Error: cannot open " << filename << '\n';
+            failed = true;
+            continue;
+        }
+        merge(total, stats);
+        
+        std::vector<WordCount> top = top_words(stats.freq, n);
+        
+        print_report("File: " + filename, stats, top);
+    }
+    if (files.size() >1){
+        std::vector<WordCount> total_top = top_words(total.freq, n);
+        print_report("=========total=========", total, total_top);
     }
     
-    std::vector<WordCount> top = top_words(stats.freq, 5);
-    
-    print_report(filename, stats, top);
-
-    return 0;
+    return failed ? 1 : 0;
 }
