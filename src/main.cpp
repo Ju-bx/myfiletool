@@ -62,7 +62,7 @@ bool count_file(const std::string& filename, FileStats& stats)
         std::string cur;
         for (std::size_t i = 0; i < line.size(); i++)
         {
-            if (line[i] != ' ' && (i == 0 || line[i - 1] == ' '))
+            if (line[i] != ' ' && ( i ==0 || line[i - 1] == ' '))
             {
                 // start of a word
                 stats.words += 1;

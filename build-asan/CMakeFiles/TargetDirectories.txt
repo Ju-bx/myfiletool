@@ -1,0 +1,3 @@
+/home/ju/Desktop/myfiletool/build-asan/CMakeFiles/myfiletool.dir
+/home/ju/Desktop/myfiletool/build-asan/CMakeFiles/edit_cache.dir
+/home/ju/Desktop/myfiletool/build-asan/CMakeFiles/rebuild_cache.dir
