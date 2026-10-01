@@ -1,1 +1,0 @@
-/usr/bin/c++ -fsanitize=address -fno-omit-frame-pointer -g CMakeFiles/myfiletool.dir/src/main.cpp.o -o myfiletool 
