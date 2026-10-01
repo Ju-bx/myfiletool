@@ -5,6 +5,7 @@
 #include <string>
 #include <cctype>
 #include <vector>
+#include <stdexcept>
 
 std::string normalize(const std::string &word)
 {
@@ -126,17 +127,12 @@ void print_report(const std::string& title, const FileStats& stats, const std::v
     std::cout << "Words: " << stats.words << '\n';
     std::cout << "Characters: " << stats.chars << '\n';
 
-    /*std::cout << "\nWord frequency:\n";
-    for (const auto &[w, c] : stats.freq)
-    {
-        std::cout << w << ": " << c << '\n';
-    }*/
-
     std::cout << "\nTop " << top.size() << " words:\n";
     for (const auto &[w, c] : top)
     {
         std::cout << w << ": " << c << '\n';
     }
+    std::cout << '\n';
 }
 
 int main(int argc, char *argv[])
@@ -165,10 +161,10 @@ int main(int argc, char *argv[])
                 try{
                     num = std::stoi(argv[i+1]);
                 }catch (const std::invalid_argument& e) {
-                    std::cerr << "無效的數字字串\n" << std::endl;
+                    std::cerr << "nuused number\n" << std::endl;
                     return 1;
                 } catch (const std::out_of_range& e) {
-                    std::cerr << "數值超出 int 範圍\n" << std::endl;
+                    std::cerr << "out of int range\n" << std::endl;
                     return 1;
                 }
                 if (num <= 0){
